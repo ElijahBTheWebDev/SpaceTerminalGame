@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Station Terminal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="title">Space Station Terminal</div>
+                <div class="controls">
+                    <button class="control-btn close"></button>
+                    <button class="control-btn minimize"></button>
+                    <button class="control-btn maximize"></button>
+                </div>
+            </div>
+            <div class="terminal-content">
+                <div id="output"></div>
+                <div class="input-line">
+                    <span class="prompt">></span>
+                    <input type="text" id="command-input" autofocus>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for password/security code entry -->
+    <div id="input-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Security Terminal</h2>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+                <input type="text" id="modal-input" autofocus>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-submit">Submit</button>
+                <button id="modal-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html> 
