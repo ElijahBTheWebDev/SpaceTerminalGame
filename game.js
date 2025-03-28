@@ -256,9 +256,36 @@ class Game {
         output.scrollTop = output.scrollHeight;
     }
 
+    clearScreen() {
+        const output = document.getElementById('output');
+        output.innerHTML = '';
+    }
+
     parseCommand(input) {
+        // Clear screen before processing new command
+        this.clearScreen();
+
         // Convert input to lowercase for easier comparison
         const lowerInput = input.toLowerCase();
+
+        // Handle numeric input for item selection
+        if (!isNaN(input) && input.trim() !== '') {
+            const num = parseInt(input);
+            if (num === 0) return;
+            
+            // Check if we're in an item selection state
+            if (this.inventory.length > 0 && num <= this.inventory.length) {
+                const item = this.inventory[num - 1];
+                this.useItem(item.name);
+                return;
+            }
+            
+            if (this.rooms[this.currentRoom].items.length > 0 && num <= this.rooms[this.currentRoom].items.length) {
+                const item = this.rooms[this.currentRoom].items[num - 1];
+                this.takeItem(item.name);
+                return;
+            }
+        }
 
         // Show oxygen warning first and keep it visible
         if (this.suitDamaged && !this.suitRepaired) {
