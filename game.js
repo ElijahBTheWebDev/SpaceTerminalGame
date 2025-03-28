@@ -6,6 +6,7 @@ class Item {
 
     examine(game) {
         game.output(`Item: ${this.name}\n\n`);
+    
         if (this.name === "Repair Manual") {
             game.output("A technical manual detailing station systems. Several pages are bookmarked:\n");
             game.output("CRITICAL SYSTEMS STATUS:\n");
@@ -23,7 +24,7 @@ class Item {
             game.output("- Must be repaired first to enable other systems", true);
             game.output("\nWARNING: Attempting system repairs without main computer online may result in cascading failures.", false, "alert");
         } else if (this.name === "ASCII Table") {
-            game.output(`Item: ${this.name}\n\n`);
+            // ❌ Remove duplicate: game.output(`Item: ${this.name}\n\n`);
             game.output("=== ASCII HEX REFERENCE ===\n\n");
             game.output("Hex  Char   |  Hex  Char   |  Hex  Char\n");
             game.output("----------------------------|----------\n");
@@ -52,11 +53,12 @@ class Item {
             game.output("6B   k      |  77    w     |  \n");
             game.output("6C   l      |  78    x     |  \n");
         } else {
-            game.output(`Item: ${this.name}\n\n`);
+            // ❌ Remove duplicate: game.output(`Item: ${this.name}\n\n`);
             game.output(this.description);
         }
     }
 }
+    
 
 class Room {
     constructor(name, description) {
