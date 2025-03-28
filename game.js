@@ -93,6 +93,11 @@ class Game {
         this.blowTorchFueled = false;
         this.controlRoomDoorOpen = false;
         this.feelAroundUsed = false;
+        this.awaitingItemUseSelection = false;
+        this.awaitingItemExamineSelection = false;
+        this.awaitingItemDropSelection = false;
+
+
 
         this.initializeGame();
         this.setupEventListeners();
@@ -197,6 +202,7 @@ class Game {
     }
 
     showModal(title, message) {
+        this.clearScreen();
         const modal = document.getElementById('input-modal');
         const modalTitle = document.getElementById('modal-title');
         const modalMessage = document.getElementById('modal-message');
@@ -218,6 +224,7 @@ class Game {
     }
 
     handleModalInput(input) {
+        this.clearScreen();
         if (this.currentRoom === 1 && !this.obsdeckDoorUnlocked) {
             if (input === this.DOOR_CODE) {
                 this.obsdeckDoorUnlocked = true;
@@ -272,20 +279,47 @@ class Game {
         if (!isNaN(input) && input.trim() !== '') {
             const num = parseInt(input);
             if (num === 0) return;
-            
-            // Check if we're in an item selection state
-            if (this.inventory.length > 0 && num <= this.inventory.length) {
+        
+            if (this.awaitingItemUseSelection) {
+                this.awaitingItemUseSelection = false;
                 const item = this.inventory[num - 1];
-                this.useItem(item.name);
+                if (item) {
+                    this.useItem("use " + item.name);
+                } else {
+                    this.output("Invalid item number.", false);
+                }
                 return;
             }
-            
+        
+            if (this.awaitingItemExamineSelection) {
+                this.awaitingItemExamineSelection = false;
+                const item = this.inventory[num - 1];
+                if (item) {
+                    this.examineItem("examine " + item.name);
+                } else {
+                    this.output("Invalid item number.", false);
+                }
+                return;
+            }
+        
+            if (this.awaitingItemDropSelection) {
+                this.awaitingItemDropSelection = false;
+                const item = this.inventory[num - 1];
+                if (item) {
+                    this.dropItem("drop " + item.name);
+                } else {
+                    this.output("Invalid item number.", false);
+                }
+                return;
+            }
+        
             if (this.rooms[this.currentRoom].items.length > 0 && num <= this.rooms[this.currentRoom].items.length) {
                 const item = this.rooms[this.currentRoom].items[num - 1];
                 this.takeItem(item.name);
                 return;
             }
         }
+        
 
         // Show oxygen warning first and keep it visible
         if (this.suitDamaged && !this.suitRepaired) {
@@ -505,8 +539,17 @@ class Game {
             this.showRoomTransition('back');
         } else if (choice === 2 && this.currentRoom < this.rooms.length - 1) {
             this.currentRoom++;
+        
+            if (this.currentRoom === 2 && !this.suitDamaged && !this.suitRepaired) {
+                this.suitDamaged = true;
+                this.commandsUntilDeath = 10;
+                this.output("As you step onto the Observation Deck, a sharp protrusion slices into your suit!", false, "alert");
+                this.output("Oxygen is leaking... You must seal the tear quickly!", false, "alert");
+            }
+        
             this.showRoomTransition('forward');
         }
+        
     }
 
     search() {
@@ -602,6 +645,7 @@ class Game {
     }
 
     listInventory() {
+        this.clearScreen();
         if (this.inventory.length === 0) {
             this.output("Your inventory is empty.", true, "info");
             return;
@@ -678,15 +722,17 @@ class Game {
                 this.output("You have nothing to examine.", false);
                 return;
             }
-
+        
             this.output("\nWhat would you like to examine?\n\n");
             this.inventory.forEach((item, index) => {
                 this.output(`${index + 1}. ${item.name}`);
             });
-
+        
             this.output("\nEnter number (or 0 to cancel): ");
+            this.awaitingItemExamineSelection = true;
             return;
         }
+        
 
         // Handle examining by name
         const itemName = input.split(" ").slice(1).join(" ").toLowerCase();
@@ -700,6 +746,7 @@ class Game {
     }
 
     showMap() {
+        this.clearScreen();
         this.output("\n=== Station Layout & Mission Info ===\n\n");
         
         const map = [
@@ -743,6 +790,7 @@ class Game {
     }
 
     showHelp() {
+        this.clearScreen();
         this.output("Available Commands:", false);
         this.output("\n");
         this.output("- search (s)", true);
@@ -759,6 +807,7 @@ class Game {
     }
 
     showRoomInfo() {
+        this.clearScreen();
         this.output(`\n=== ${this.rooms[this.currentRoom].name} Information ===\n\n`);
         
         switch(this.currentRoom) {
@@ -843,15 +892,17 @@ class Game {
                 this.output("You have no items to use.", false);
                 return;
             }
-            
+        
             this.output("Which item do you want to use?\n\n");
             this.inventory.forEach((item, index) => {
                 this.output(`${index + 1}. ${item.name}`);
             });
-            
+        
             this.output("\nEnter number (or 0 to cancel): ");
+            this.awaitingItemUseSelection = true;
             return;
         }
+        
 
         const itemName = input.split(" ").slice(1).join(" ").toLowerCase();
         const item = this.inventory.find(item => item.name.toLowerCase() === itemName);
@@ -973,15 +1024,17 @@ class Game {
                 this.output("You have no items to drop.", false);
                 return;
             }
-
+        
             this.output("What do you want to drop?\n\n");
             this.inventory.forEach((item, index) => {
                 this.output(`${index + 1}. ${item.name}`);
             });
-            
+        
             this.output("\nEnter number (or 0 to cancel): ");
+            this.awaitingItemDropSelection = true;
             return;
         }
+        
 
         const itemName = input.split(" ").slice(1).join(" ").toLowerCase();
         const itemIndex = this.inventory.findIndex(item => item.name.toLowerCase() === itemName);
