@@ -271,11 +271,14 @@ class Game {
     }
 
     parseCommand(input) {
-        // Clear screen before processing new command
         this.clearScreen();
-
-        // Convert input to lowercase for easier comparison
+    
+        if (!input.trim()) {
+            return; // ⬅️ Prevents "Unknown command ''" on empty enter
+        }
+    
         const lowerInput = input.toLowerCase();
+        
 
         // Handle numeric input for item selection
         if (!isNaN(input) && input.trim() !== '') {
@@ -719,7 +722,7 @@ class Game {
         }
 
         // If no item specified, show numbered list
-        if (!input || input === "examine") {
+        if (!input || input === "examine" || input === "e") {
             if (this.inventory.length === 0) {
                 this.output("You have nothing to examine.", false);
                 return;
@@ -889,7 +892,7 @@ class Game {
     }
 
     useItem(input) {
-        if (!input || input === "use") {
+        if (!input || input === "use" || input === "u") {
             if (this.inventory.length === 0) {
                 this.output("You have no items to use.", false);
                 return;
@@ -1021,7 +1024,7 @@ class Game {
     }
 
     dropItem(input) {
-        if (!input || input === "drop") {
+        if (!input || input === "drop" || input === "d") {
             if (this.inventory.length === 0) {
                 this.output("You have no items to drop.", false);
                 return;
